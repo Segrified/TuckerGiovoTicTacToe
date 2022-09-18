@@ -1,0 +1,170 @@
+"""
+Author: Tucker Giovo
+Assignment: Tic-Tac-Toe
+"""
+
+#Global Variables Board and Player to keep track of who's turn it is, and what the board looks like
+board = [
+    ["1", "2", "3"],
+    ["4", "5", "6"],
+    ["7", "8", "9"]
+]
+player = int(0)
+
+#Checks if the player wants to end the game
+def endCheck(uInput):
+    if uInput.lower() == "e":
+        print("Goodbye")
+        return True
+    else:
+        return False
+
+#Displays the board
+def displayBoard(board):
+    rowCount = 0
+    colCount = 0
+
+    for row in board:
+        for slot in row:
+            if rowCount < 2:
+                print(f"{slot} | ", end="")
+                rowCount += 1
+            else:
+                print(slot)
+                rowCount = 0
+        if colCount < 2:
+            print("--+---+--")
+            colCount += 1
+        else:
+            colCount = 0
+
+#Checks if the input is a number between 1 and 9
+def validInputCheck(uInput):
+    if uInput.isnumeric() and (0 < int(uInput) < 10):
+        return True
+    else:
+        return False
+
+#Turns the input into usable coordinates on the board
+def getCoordinates(uInput):
+    r = int(uInput / 3)
+    c = uInput
+    if c > 2:
+        c = int(c % 3)
+    return [r, c]
+
+#Checks if the chosen spot has already been taken
+def inputTaken(coordinates, board):
+    r = coordinates[0]
+    c = coordinates[1]
+    if not board[r][c].isnumeric():
+        return True
+    else:
+        return False
+
+#applies changes to the board
+def changeBoard(coordinates, board, player):
+    r = coordinates[0]
+    c = coordinates[1]
+
+    if player == 0:
+        board[r][c] = "X"
+    else:
+        board[r][c] = "O"
+
+#Checks for win via full row
+def rowCheck(board, player):
+    for row in board:
+        fullRow = True
+        for slot in row:
+            if player == 0:
+                if slot != "X":
+                    fullRow = False
+                    break
+            if player == 1:
+                if slot != "O":
+                    fullRow = False
+                    break
+        if fullRow:
+            return True
+    return False
+
+#Checks for win via full column
+def colCheck(board, player):
+    for col in range(3):
+        fullCol = True
+        for row in range(3):
+            if player == 0:
+                if board[row][col] != "X":
+                    fullCol = False
+                    break
+            if player == 1:
+                if board[row][col] != "O":
+                    fullCol = False
+                    break
+        if fullCol:
+            return True
+    return False  
+
+#Manually checks win via diagonal win conditions
+def diagonalCheck(board, player):
+    if player == 0:
+        if board [0][0] == "X" and board[1][1] == "X" and board[2][2] == "X":
+            return True
+        if board [0][2] == "X" and board[2][2] == "X" and board[2][0] == "X":
+            return True
+    if player == 1:
+        if board [0][0] == "O" and board[1][1] == "O" and board[2][2] == "O":
+            return True
+        if board [0][2] == "O" and board[2][2] == "O" and board[2][0] == "O":
+            return True
+    else:
+        return False
+
+#Runs all the win checks
+def winCheck(board, player):
+    if rowCheck(board, player):
+        return True
+    if colCheck(board, player):
+        return True
+    if diagonalCheck(board, player):
+        return True
+    else:
+        return False
+
+while True:
+    #Begin by displaying the board
+    displayBoard(board)
+    
+    #Ask for input and check if it is a number between 1 and 9, restart if false
+    print("Player ", player + 1, end = "")
+    uInput = input(", Enter a number between 1 and 9, or \"e\" to Exit: ")
+    if endCheck(uInput):
+        break
+    if validInputCheck(uInput):
+        uInput = int(uInput) - 1
+    else:
+        print("Invalid input, please try again.")
+        continue
+    
+    #Convert into usable coordinates
+    coordinates = getCoordinates(uInput)
+
+    #Check if spot is taken, restart if true
+    if inputTaken(coordinates, board):
+        print("That spot is already taken, try again.")
+        continue
+
+    #Apply valid changes to board
+    changeBoard(coordinates, board, player)
+
+    #Check for win condition, change player if false
+    if winCheck(board, player):
+        displayBoard(board)
+        print("Player ", player + 1, " wins!")
+        break
+    else:
+        if player == 0:
+            player += 1
+        else:
+            player -= 1
